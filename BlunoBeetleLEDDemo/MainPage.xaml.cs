@@ -4,11 +4,9 @@ using Plugin.BLE.Abstractions.Contracts;
 using Plugin.BLE.Abstractions.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace BlunoBeetleLEDDemo
@@ -20,6 +18,7 @@ namespace BlunoBeetleLEDDemo
         IAdapter adapter = CrossBluetoothLE.Current.Adapter;
         private IService service;
         private ICharacteristic characteristic;
+        private string status = "1";
 
         public MainPage()
         {
@@ -28,12 +27,8 @@ namespace BlunoBeetleLEDDemo
 
         private async void ScanDevices()
         {
-
-
             adapter.ScanMode = Plugin.BLE.Abstractions.Contracts.ScanMode.LowLatency;
-
             adapter.ScanTimeout = 5000;
-
             adapter.DeviceDiscovered += (s, a) =>
             {
                 if (deviceList.Count == 0 && !string.IsNullOrEmpty(a.Device.Name) && a.Device.Name.ToLower().Equals("bluno"))
@@ -44,7 +39,6 @@ namespace BlunoBeetleLEDDemo
             };
 
             await adapter.StartScanningForDevicesAsync();
-
         }
 
         private void ScanClicked(object sender, EventArgs e)
@@ -71,13 +65,10 @@ namespace BlunoBeetleLEDDemo
             }
         }
 
-        private string status = "1";
-
         private void ToggleClicked(object sender, EventArgs e)
         {
             try
             {
-
                 characteristic.WriteAsync(Encoding.ASCII.GetBytes(status));
                 if (status.Equals("1"))
                     status = "0";
@@ -88,7 +79,7 @@ namespace BlunoBeetleLEDDemo
             }
             catch (Exception exception)
             {
-
+                Debug.WriteLine(exception.Message);
             }
         }
     }
